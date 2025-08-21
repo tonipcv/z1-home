@@ -14,7 +14,7 @@ const dict = {
       request: 'Request Analysis',
     },
     home: {
-      title: 'Loyalty & Referral Programs: Technical Analysis and Program Design (Zuzz Methodology)',
+      title: 'Loyalty & Referral Programs: Technical Analysis and Program Design',
       intro: 'We design and validate loyalty and referral mechanisms for businesses of all sizes. The objective is to increase repeat purchases, improve product attach rate, and maximize Customer Lifetime Value (CLV) with measurable, data-driven interventions.',
       scope: 'Scope',
       items: [
@@ -27,7 +27,7 @@ const dict = {
       seeArticle: 'See related article:',
       readBlog: 'Read the Blog',
       modalTitle: 'Request a Loyalty & Referral Program Analysis',
-      modalDesc: 'Provide your details to receive a structured assessment and a Zuzz methodology proposal tailored to your business.',
+      modalDesc: 'Provide your details to receive a structured assessment and a proposal tailored to your business.',
       name: 'Name',
       email: 'Email',
       phone: 'Phone',
