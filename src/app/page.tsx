@@ -24,7 +24,7 @@ import {
   ChevronRightIcon,
   ArrowRightIcon
 } from '@heroicons/react/24/outline';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Alegreya } from 'next/font/google';
 import { getDict } from '@/lib/i18n';
@@ -48,6 +48,7 @@ const stagger = {
 export default function HomePage() {
   const t = getDict('en');
   const [showRequestModal, setShowRequestModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -55,6 +56,18 @@ export default function HomePage() {
     phone: '',
     specialties: [] as string[]
   });
+
+  // Auto-redirect to Calendly when success modal opens
+  useEffect(() => {
+    if (showSuccessModal) {
+      const url = 'https://calendly.com/getcxlus/free-consultation-to-implement-zuzz';
+      // small delay to allow modal paint (optional); adjust or remove as desired
+      const timer = setTimeout(() => {
+        window.location.href = url;
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessModal]);
 
   return (
     <div className="min-h-screen bg-white text-black antialiased flex flex-col">
@@ -114,32 +127,17 @@ export default function HomePage() {
         {/* Request Access Modal */}
         <Dialog open={showRequestModal} onOpenChange={setShowRequestModal}>
           <DialogContent className="bg-white max-w-[95%] sm:max-w-2xl w-full p-0 rounded-2xl border border-gray-200 shadow-xl overflow-hidden mx-auto my-4 sm:my-8">
-            <div className="grid grid-cols-1 sm:grid-cols-5">
-              {/* Intro panel */}
-              <div className="hidden sm:block sm:col-span-2 bg-gradient-to-b from-slate-50 to-white border-r border-gray-200 p-6">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-semibold text-black leading-snug">{t.home.modalTitle}</DialogTitle>
-                  <DialogDescription className="text-sm text-gray-600 mt-2">{t.home.modalDesc}</DialogDescription>
-                </DialogHeader>
-                <ul className="mt-6 space-y-3 text-sm text-gray-700 list-disc pl-5">
-                  <li>Baseline cohort diagnostics</li>
-                  <li>Program mechanics and incentives</li>
-                  <li>Experimentation plan and ROI tracking</li>
-                </ul>
-              </div>
+            <div className="p-4 sm:p-6">
+              <DialogHeader>
+                <DialogTitle className="text-xl sm:text-2xl font-semibold text-black leading-snug">{t.home.modalTitle}</DialogTitle>
+                <DialogDescription className="text-sm text-gray-600 mt-1 sm:mt-2">{t.home.modalDesc}</DialogDescription>
+              </DialogHeader>
 
-              {/* Form panel */}
-              <div className="col-span-1 sm:col-span-3 p-4 sm:p-6">
-                <DialogHeader className="sm:hidden">
-                  <DialogTitle className="text-xl font-semibold text-black leading-snug">{t.home.modalTitle}</DialogTitle>
-                  <DialogDescription className="text-sm text-gray-600 mt-1">{t.home.modalDesc}</DialogDescription>
-                </DialogHeader>
-
-                <motion.div 
-                  className="mt-2 sm:mt-4 space-y-4"
-                  initial={{ opacity: 1, y: 0 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
+              <motion.div 
+                className="mt-3 sm:mt-5 space-y-4"
+                initial={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name" className="text-sm font-medium text-gray-800">{t.home.name}</Label>
@@ -223,8 +221,7 @@ export default function HomePage() {
                             specialties: []
                           });
                           setShowRequestModal(false);
-
-                          alert('Thank you. We\'ll contact you to schedule your program analysis.');
+                          setShowSuccessModal(true);
                         } catch (error) {
                           alert('Failed to submit request. Please try again.');
                         } finally {
@@ -240,8 +237,27 @@ export default function HomePage() {
                     </Button>
                     <p className="mt-3 text-xs text-center text-gray-500">{t.home.tos}</p>
                   </div>
-                </motion.div>
-              </div>
+              </motion.div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Success Modal */}
+        <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+          <DialogContent className="bg-white max-w-md w-full p-6 rounded-2xl border border-gray-200 shadow-xl overflow-hidden mx-auto">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold text-black leading-snug">Request received</DialogTitle>
+              <DialogDescription className="text-sm text-gray-600 mt-2">
+                Thanks! We’re redirecting you to schedule a free consultation now.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4 flex items-center justify-end gap-2">
+              <a
+                href="https://calendly.com/getcxlus/free-consultation-to-implement-zuzz"
+                className="inline-flex items-center px-4 py-2 rounded-md bg-blue-700 text-white hover:bg-blue-800 text-sm"
+              >
+                Go to scheduling
+              </a>
             </div>
           </DialogContent>
         </Dialog>

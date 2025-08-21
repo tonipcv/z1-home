@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient, Prisma } from '@prisma/client';
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
+  const requestId = randomUUID();
   try {
     const data = await request.json();
     // Debug: log incoming payload
     console.log('[access-request] Incoming payload:', {
+      requestId,
       ...data,
       // Avoid logging very long strings
       message: typeof data?.message === 'string' ? `${data.message.substring(0, 200)}${data.message.length > 200 ? '…' : ''}` : data?.message,
@@ -17,12 +20,17 @@ export async function POST(request: Request) {
     const requiredFields = ['name', 'email'];
     const missingFields = requiredFields.filter((f) => !data?.[f]);
     if (missingFields.length > 0) {
-      console.warn('[access-request] Missing required fields:', missingFields);
+      const receivedTypes: Record<string, string> = Object.fromEntries(
+        Object.entries(data || {}).map(([k, v]) => [k, Array.isArray(v) ? 'array' : typeof v])
+      );
+      console.warn('[access-request] Missing required fields:', { requestId, missingFields, receivedTypes });
       return NextResponse.json(
         {
           error: 'Missing required fields',
           missingFields,
           receivedKeys: Object.keys(data || {}),
+          receivedTypes,
+          requestId,
         },
         { status: 400 }
       );
@@ -41,39 +49,49 @@ export async function POST(request: Request) {
       data.specialties = [];
     }
 
-    // Create access request
+    // Map frontend payload to current DB schema
+    const [firstName, ...rest] = String(data.name || '').trim().split(/\s+/);
+    const lastName = rest.join(' ') || 'N/A';
+    const industry = (Array.isArray(data.specialties) && data.specialties[0]) ? String(data.specialties[0]) : (typeof data.specialties === 'string' ? data.specialties : 'N/A');
+
     const accessRequest = await prisma.accessRequest.create({
       data: {
-        name: data.name,
+        firstName: firstName || 'N/A',
+        lastName,
         email: data.email,
         company: data.company || 'N/A',
-        role: data.role || 'N/A',
-        clinicSize: data.clinicSize || 'N/A',
-        specialties: data.specialties,
-        currentSystem: data.currentSystem || 'N/A',
+        jobTitle: data.jobTitle || 'N/A',
+        phoneNumber: data.phone || data.phoneNumber || 'N/A',
+        industry: industry || 'N/A',
+        companySize: data.companySize || 'N/A',
+        useCase: data.useCase || 'N/A',
         budget: data.budget || 'N/A',
         timeline: data.timeline || 'N/A',
-        message: data.message || null,
+        additionalInfo: data.message || data.additionalInfo || null,
+        status: typeof data.status === 'string' ? data.status : 'PENDING',
       },
     });
 
-    return NextResponse.json(accessRequest, { status: 201 });
+    return NextResponse.json({ requestId, data: accessRequest }, { status: 201 });
   } catch (error) {
     // Improve error logging, including Prisma error codes
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      console.error('[access-request] Prisma error:', {
-        code: error.code,
-        meta: error.meta,
-        message: error.message,
-      });
+      const err = { code: error.code, meta: error.meta, message: error.message };
+      console.error('[access-request] Prisma error:', { requestId, ...err });
     } else {
-      console.error('[access-request] Failed to create access request:', error);
+      const safeError =
+        error instanceof Error
+          ? { name: error.name, message: error.message, stack: error.stack }
+          : { value: String(error) };
+      console.error('[access-request] Failed to create access request:', { requestId, error: safeError });
     }
     return NextResponse.json(
       {
         error: 'Failed to create access request',
         // Expose minimal safe details for debugging
         message: error instanceof Error ? error.message : String(error),
+        prismaCode: error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined,
+        requestId,
       },
       { status: 500 }
     );

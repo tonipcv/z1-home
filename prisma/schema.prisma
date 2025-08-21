@@ -126,20 +126,22 @@ model ScorecardSubmission {
 }
 
 model AccessRequest {
-  id            String      @id @default(cuid())
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  name          String
-  email         String
-  company       String
-  role          String
-  clinicSize    String
-  specialties   String[]
-  currentSystem String
-  budget        String
-  timeline      String
-  message       String?
-  status        RequestStatus @default(PENDING)
+  id             String   @id @default(cuid())
+  firstName      String
+  lastName       String
+  email          String
+  company        String
+  jobTitle       String
+  phoneNumber    String
+  industry       String
+  companySize    String
+  useCase        String
+  budget         String
+  timeline       String
+  additionalInfo String?
+  status         String   @default("PENDING")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 enum RequestStatus {
