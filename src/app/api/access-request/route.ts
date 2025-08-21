@@ -13,8 +13,8 @@ export async function POST(request: Request) {
       message: typeof data?.message === 'string' ? `${data.message.substring(0, 200)}${data.message.length > 200 ? '…' : ''}` : data?.message,
     });
 
-    // Validate required fields and report all missing at once
-    const requiredFields = ['name', 'email', 'company', 'role', 'clinicSize', 'currentSystem', 'budget', 'timeline'];
+    // Validate required fields and report all missing at once (relaxed)
+    const requiredFields = ['name', 'email'];
     const missingFields = requiredFields.filter((f) => !data?.[f]);
     if (missingFields.length > 0) {
       console.warn('[access-request] Missing required fields:', missingFields);
@@ -46,13 +46,13 @@ export async function POST(request: Request) {
       data: {
         name: data.name,
         email: data.email,
-        company: data.company,
-        role: data.role,
-        clinicSize: data.clinicSize,
+        company: data.company || 'N/A',
+        role: data.role || 'N/A',
+        clinicSize: data.clinicSize || 'N/A',
         specialties: data.specialties,
-        currentSystem: data.currentSystem,
-        budget: data.budget,
-        timeline: data.timeline,
+        currentSystem: data.currentSystem || 'N/A',
+        budget: data.budget || 'N/A',
+        timeline: data.timeline || 'N/A',
         message: data.message || null,
       },
     });
