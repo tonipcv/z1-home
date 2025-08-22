@@ -98,7 +98,6 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="text-size-adjust" content="none" />
-        <FacebookPixel />
         {/* Structured Data */}
         <script
           type="application/ld+json"
@@ -116,6 +115,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} antialiased h-full`}>
+        <FacebookPixel />
         {children}
       </body>
     </html>

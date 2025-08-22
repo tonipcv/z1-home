@@ -1,8 +1,24 @@
 'use client'
 
 import Script from 'next/script'
+import { useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 
 export function FacebookPixel() {
+  const pathname = usePathname()
+  const initializedRef = useRef(false)
+
+  // Track PageView on client-side route changes (App Router SPA)
+  useEffect(() => {
+    if (!initializedRef.current) {
+      // First load already triggers PageView from the base snippet
+      initializedRef.current = true
+      return
+    }
+    // @ts-ignore
+    window.fbq?.('track', 'PageView')
+  }, [pathname])
+
   return (
     <>
       <Script id="facebook-pixel" strategy="afterInteractive">
@@ -15,7 +31,7 @@ export function FacebookPixel() {
           t.src=v;s=b.getElementsByTagName(e)[0];
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js');
-          fbq('init', '1825091108430625');
+          fbq('init', '2081938345668852');
           fbq('track', 'PageView');
         `}
       </Script>
@@ -24,7 +40,7 @@ export function FacebookPixel() {
           height="1" 
           width="1" 
           style={{ display: 'none' }}
-          src={`https://www.facebook.com/tr?id=1825091108430625&ev=PageView&noscript=1`}
+          src={`https://www.facebook.com/tr?id=2081938345668852&ev=PageView&noscript=1`}
           alt=""
         />
       </noscript>
