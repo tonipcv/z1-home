@@ -221,6 +221,9 @@ export default function HomePage() {
                             specialties: []
                           });
                           setShowRequestModal(false);
+                          // Track Lead conversion with Facebook Pixel
+                          // @ts-ignore
+                          window.fbq?.('track', 'Lead');
                           setShowSuccessModal(true);
                         } catch (error) {
                           alert('Failed to submit request. Please try again.');
