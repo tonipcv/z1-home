@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { getDict } from '@/lib/i18n'
+import RequestAnalysisCTA from '@/components/request-analysis-modal'
 
 export default function BlogPost() {
   const t = getDict('en')
@@ -119,7 +120,7 @@ export default function BlogPost() {
           </article>
 
           <div className="mt-8 text-sm text-gray-700">
-            Next: <Link href="/" className="text-blue-700 hover:underline">Request an analysis</Link>
+            Next: <RequestAnalysisCTA label="Request an analysis" className="text-blue-700 hover:underline" />
           </div>
         </div>
       </section>

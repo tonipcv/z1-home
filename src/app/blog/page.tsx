@@ -32,6 +32,16 @@ blogPosts.unshift({
   date: "Aug 21, 2025"
 })
 
+// Added: comprehensive CLV strategy report
+blogPosts.unshift({
+  title: "Maximizing Customer Value: A Strategic Report on Loyalty, Referrals, and Psychological Leverage",
+  description: "End-to-end, data-backed playbook: CLV & LTV:CAC, loyalty/subscriptions, viral referrals, B2B adaptations, behavioral economics, costs, fraud, benchmarks.",
+  category: "Strategy",
+  readTime: "14 min read",
+  slug: "maximizing-customer-value-loyalty-referrals-psychology",
+  date: "Aug 22, 2025"
+})
+
 export default function BlogIndex() {
   const t = getDict('en')
   return (

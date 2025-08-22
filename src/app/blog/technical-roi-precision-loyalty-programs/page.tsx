@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getDict } from '@/lib/i18n';
+import RequestAnalysisCTA from '@/components/request-analysis-modal'
 
 export const metadata: Metadata = {
   title: 'From One-Off Visits to Market Dominance: Technical ROI of Precision Loyalty Programs | Zuzz',
@@ -161,7 +162,7 @@ export default function BlogPost() {
           </article>
 
           <div className="mt-8 text-sm text-gray-700">
-            Next: <Link href="/" className="text-blue-700 hover:underline">Request an analysis</Link>
+            Next: <RequestAnalysisCTA label="Request an analysis" className="text-blue-700 hover:underline" />
           </div>
         </div>
       </section>
