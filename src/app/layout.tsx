@@ -2,6 +2,8 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter, Alegreya } from 'next/font/google'
 import { FacebookPixel } from '@/components/FacebookPixel'
+import { cookies, headers } from 'next/headers'
+import { normalizeLang } from '@/lib/i18n'
 
 const inter = Inter({ subsets: ['latin'] })
 const alegreya = Alegreya({ subsets: ['latin'] })
@@ -84,13 +86,19 @@ export const viewport = {
   themeColor: '#000000',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  // Determine language server-side to set the <html lang> attribute
+  const cookieStore = await cookies()
+  const hdrs = await headers()
+  const country = cookieStore.get('country')?.value
+  const acceptLang = hdrs.get('accept-language') || undefined
+  const lang = country === 'BR' ? 'pt' : normalizeLang(acceptLang ?? 'en')
   return (
-    <html lang="en" suppressHydrationWarning className="h-full">
+    <html lang={lang} suppressHydrationWarning className="h-full">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="32x32" />
         <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png" />

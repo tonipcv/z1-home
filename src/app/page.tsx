@@ -24,10 +24,11 @@ import {
   ChevronRightIcon,
   ArrowRightIcon
 } from '@heroicons/react/24/outline';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Alegreya } from 'next/font/google';
-import { getDict } from '@/lib/i18n';
+import { getDict, normalizeLang } from '@/lib/i18n';
+import type { Lang } from '@/lib/i18n';
 
 const alegreya = Alegreya({ subsets: ['latin'] });
 
@@ -46,7 +47,8 @@ const stagger = {
 };
 
 export default function HomePage() {
-  const t = getDict('en');
+  const [lang, setLang] = useState<Lang>('en');
+  const t = useMemo(() => getDict(lang), [lang]);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,6 +70,21 @@ export default function HomePage() {
       return () => clearTimeout(timer);
     }
   }, [showSuccessModal]);
+
+  // Detect language: prefer Brazil visitors or browser Portuguese
+  useEffect(() => {
+    try {
+      const cookieStr = typeof document !== 'undefined' ? document.cookie : '';
+      const country = cookieStr
+        .split('; ')
+        .find((c) => c.startsWith('country='))?.split('=')[1];
+      const navLang = typeof navigator !== 'undefined' ? navigator.language : undefined;
+      const isPt = (country === 'BR') || (navLang ? normalizeLang(navLang) === 'pt' : false);
+      setLang(isPt ? 'pt' : 'en');
+    } catch (_) {
+      setLang('en');
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-white text-black antialiased flex flex-col">
@@ -107,9 +124,9 @@ export default function HomePage() {
                   ))}
                 </ul>
 
-                <div className="mt-6 text-sm text-gray-600">
+                <div className="mt-2 text-sm text-gray-600">
                   {t.home.seeArticle}{' '}
-                  <Link href={'/blog/technical-roi-precision-loyalty-programs'} className="text-blue-700 hover:underline">Technical ROI of Precision Loyalty Programs</Link>.
+                  <Link href={'/blog/how-to-create-a-loyalty-program-step-by-step'} className="text-blue-700 hover:underline">How to Create a Loyalty Program from Scratch: A Step-by-Step Guide</Link>.
                 </div>
 
                 <div className="mt-6 flex items-center gap-4 text-sm">
@@ -122,6 +139,38 @@ export default function HomePage() {
               </div>
             </div>
           </motion.div>
+        </section>
+
+        {/* Case Studies - horizontal scroll (YC-like minimalist) */}
+        <section className="px-4 py-8">
+          <div className="max-w-screen-xl mx-auto">
+            <h2 className="text-[15px] font-semibold tracking-tight text-gray-800 mb-3 text-center">{t.home.caseStudies}</h2>
+            <div className="px-2 overflow-x-auto">
+              <div
+                className="flex gap-2 snap-x snap-mandatory justify-center [scrollbar-width:none] [-ms-overflow-style:none]"
+                style={{ WebkitOverflowScrolling: 'touch' }}
+              >
+                {[{src:'/b1.jpeg', alt:'The Tea Spot'}, {src:'/b2.jpg', alt:'Jiffylube'}, {src:'/b3.jpeg', alt:'Dagne Dover'}, {src:'/b4.jpeg', alt:'Massage Envy'}].map((it, idx) => (
+                  <div
+                    key={idx}
+                    className="snap-center shrink-0 w-[150px] sm:w-[180px] bg-white rounded-lg overflow-hidden ring-1 ring-gray-200 hover:ring-gray-300 transition hover:-translate-y-0.5 hover:shadow-sm duration-200"
+                  >
+                    <div className="overflow-hidden">
+                      <img
+                        src={it.src}
+                        alt={it.alt}
+                        className="w-full h-28 sm:h-32 object-cover grayscale hover:grayscale-0 transition duration-300"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="px-2 py-1.5">
+                      <p className="text-[10px] text-gray-600 leading-snug text-center">{it.alt}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Request Access Modal */}
@@ -178,19 +227,19 @@ export default function HomePage() {
                       <Label htmlFor="industry" className="text-sm font-medium text-gray-800">{t.home.industry}</Label>
                       <Select onValueChange={(value) => setFormData({...formData, specialties: [value]})}>
                         <SelectTrigger className="w-full px-3 py-2 bg-white border-gray-300 rounded-md focus:ring-1 focus:ring-blue-600 focus:border-blue-600">
-                          <SelectValue placeholder="Select your industry" />
+                          <SelectValue placeholder={t.home.industryPlaceholder} />
                         </SelectTrigger>
                         <SelectContent className="bg-white border border-gray-200 rounded-md">
-                          <SelectItem value="retail">Retail</SelectItem>
-                          <SelectItem value="ecommerce">E-commerce</SelectItem>
-                          <SelectItem value="hospitality">Hospitality</SelectItem>
-                          <SelectItem value="health-wellness">Health & Wellness</SelectItem>
-                          <SelectItem value="beauty-aesthetics">Beauty & Aesthetics</SelectItem>
-                          <SelectItem value="fitness">Fitness</SelectItem>
-                          <SelectItem value="food-beverage">Food & Beverage</SelectItem>
-                          <SelectItem value="professional-services">Professional Services</SelectItem>
-                          <SelectItem value="saas">SaaS / Software</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                          <SelectItem value="retail">{t.home.industries.retail}</SelectItem>
+                          <SelectItem value="ecommerce">{t.home.industries.ecommerce}</SelectItem>
+                          <SelectItem value="hospitality">{t.home.industries.hospitality}</SelectItem>
+                          <SelectItem value="health-wellness">{t.home.industries.healthWellness}</SelectItem>
+                          <SelectItem value="beauty-aesthetics">{t.home.industries.beautyAesthetics}</SelectItem>
+                          <SelectItem value="fitness">{t.home.industries.fitness}</SelectItem>
+                          <SelectItem value="food-beverage">{t.home.industries.foodBeverage}</SelectItem>
+                          <SelectItem value="professional-services">{t.home.industries.professionalServices}</SelectItem>
+                          <SelectItem value="saas">{t.home.industries.saas}</SelectItem>
+                          <SelectItem value="other">{t.home.industries.other}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -236,7 +285,7 @@ export default function HomePage() {
                         isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     >
-                      {isSubmitting ? 'Processing...' : t.home.submit}
+                      {isSubmitting ? t.home.processing : t.home.submit}
                     </Button>
                     <p className="mt-3 text-xs text-center text-gray-500">{t.home.tos}</p>
                   </div>
@@ -249,9 +298,9 @@ export default function HomePage() {
         <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
           <DialogContent className="bg-white max-w-md w-full p-6 rounded-2xl border border-gray-200 shadow-xl overflow-hidden mx-auto">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-black leading-snug">Request received</DialogTitle>
+              <DialogTitle className="text-xl font-semibold text-black leading-snug">{t.home.successTitle}</DialogTitle>
               <DialogDescription className="text-sm text-gray-600 mt-2">
-                Thanks! We’re redirecting you to schedule a free consultation now.
+                {t.home.successDesc}
               </DialogDescription>
             </DialogHeader>
             <div className="mt-4 flex items-center justify-end gap-2">
@@ -259,7 +308,7 @@ export default function HomePage() {
                 href="https://calendly.com/getcxlus/free-consultation-to-implement-zuzz"
                 className="inline-flex items-center px-4 py-2 rounded-md bg-blue-700 text-white hover:bg-blue-800 text-sm"
               >
-                Go to scheduling
+                {t.home.successCta}
               </a>
             </div>
           </DialogContent>
@@ -281,4 +330,5 @@ export default function HomePage() {
       </footer>
     </div>
   );
-} 
+}
+ 
