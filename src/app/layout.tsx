@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter, Alegreya } from 'next/font/google'
 import { FacebookPixel } from '@/components/FacebookPixel'
+import { Analytics } from '@/components/Analytics'
 import { cookies, headers } from 'next/headers'
 import { normalizeLang } from '@/lib/i18n'
 
@@ -124,6 +125,7 @@ export default async function RootLayout({
       </head>
       <body className={`${inter.className} antialiased h-full`}>
         <FacebookPixel />
+        <Analytics />
         {children}
       </body>
     </html>
